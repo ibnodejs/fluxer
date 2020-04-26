@@ -5,10 +5,10 @@
  *
  * Get started by importing everything we need!
  */
-const Influx = require('../../')
-const express = require('express')
-const http = require('http')
-const os = require('os')
+import Influx from '../../'
+import express from 'express'
+import http from 'http'
+import os from 'os'
 
 const app = express()
 
