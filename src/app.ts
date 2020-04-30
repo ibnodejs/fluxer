@@ -33,21 +33,6 @@ app.post('/v1/insert', function (req, res) {
 
     const items: any = [];
 
-    if (typeof data === "object") {
-        const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = req.body as any;
-        items.push(
-            {
-                measurement: MarketDataMeasurement,
-                fields: {
-                    symbol, open, high, low, close, volume
-                },
-                tags: {
-                    symbol
-                }
-            }
-        )
-    }
-
     if (Array.isArray(data)) {
         data.map(item => {
             const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = item as any;
@@ -63,9 +48,28 @@ app.post('/v1/insert', function (req, res) {
                 }
             )
         })
+    } else {
+        const item = data as any;
+        const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = item;
+
+        if (item && item.symbol) {
+            items.push(
+                {
+                    measurement: MarketDataMeasurement,
+                    fields: {
+                        symbol, open, high, low, close, volume
+                    },
+                    tags: {
+                        symbol
+                    }
+                }
+            )
+        }
+
     }
 
     res.end();
+
     if (!isEmpty(items)) {
         influx.writePoints(items)
     }
