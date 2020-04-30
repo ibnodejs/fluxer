@@ -10,10 +10,13 @@ import { PORT, databaseName, appName, HOSTNAME } from './config';
 const app = nanoexpress();
 
 app.get('/', function (req, res) {
+
     res.json({
         hostname: HOSTNAME,
         date: new Date
     })
+
+    console.log('health check')
 })
 
 app.get('/v1/query', function (req, res) {
