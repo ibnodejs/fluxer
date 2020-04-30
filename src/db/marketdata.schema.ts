@@ -1,6 +1,6 @@
 import { ISchemaOptions, FieldType } from 'influx';
 
-export const MarketDataMeasurement = 'market_data';
+export const MarketDataMeasurement = 'market';
 
 export interface MarketDataSchema {
     symbol: string;
