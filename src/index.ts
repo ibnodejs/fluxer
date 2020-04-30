@@ -2,12 +2,10 @@ import express from 'express';
 import influx from './db/database';
 import bodyParser from 'body-parser';
 import { MarketDataMeasurement } from './db/marketdata.schema';
+import nanoexpress from 'nanoexpress';
+// const app: express.Application = express()
 
-const app: express.Application = express()
-
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-
+const app = nanoexpress();
 
 app.get('/v1/query', function (req, res) {
     influx.query('select * from exodus_table')
@@ -18,20 +16,22 @@ app.get('/v1/query', function (req, res) {
 })
 
 app.post('/v1/insert', function (req, res) {
+    // TODO Insert object or array
+    const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = req.body as any;
+
+    res.end();
     influx.writePoints([
         {
-            measurement: 'exodus_table',
+            measurement: MarketDataMeasurement,
             fields: {
-                symbol: req.body.symbol,
-                open: 1.1,
-                high: 1.1,
-                low: 1.1,
-                close: 1.1,
-                volume: 1
+                symbol, open, high, low, close, volume
+            },
+            tags: {
+                symbol
             }
         }
     ])
-    res.end()
+
 })
 
 influx.getDatabaseNames()
