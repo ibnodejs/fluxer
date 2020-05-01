@@ -23,6 +23,7 @@ app.get('/', function (req, res) {
 
 app.get('/v1/query', async function async(req, res) {
 
+    const { symbol = "AAPL", startDate, endDate, range } = req.params;
     const curDate = new Date();
     const cloneDate = new Date(curDate);
 
@@ -34,7 +35,7 @@ app.get('/v1/query', async function async(req, res) {
     SELECT mean("close") AS "mean_close", mean("high") AS "mean_high", mean("low") AS "mean_low", mean("volume") AS "mean_volume", mean("open") AS "mean_open" 
     FROM "exodus"."autogen"."market" 
     WHERE time > ${startingDate} AND time < ${endingDate} 
-    AND "symbol"='AAPL' GROUP BY time(1m)`;
+    AND "symbol"='${symbol}' GROUP BY time(1m)`;
 
     let data = [];
     try {
