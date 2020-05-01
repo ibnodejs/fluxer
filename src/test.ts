@@ -6,10 +6,9 @@ import { PORT, appName } from './config';
 
 // Start server
 runApp();
+before(done => setTimeout(done, 1500)); // timeout for server to start
 
 const request = supertest(`http://127.0.0.1:${PORT}`);
-
-beforeEach(done => setTimeout(done, 1500));
 
 const object = {
     symbol: "USO",
@@ -65,11 +64,13 @@ describe(`Server ${appName}`, () => {
     });
 
     // query
-
-    it('should not insert empty market data item', function (done) {
+    it('should query market data item', function (done) {
+        const cur = new Date();
         request.get('/v1/query')
-            .send({})
+            .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)), range: '10m' })
             .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect((res) => res.body != [])
             .expect(200, done);
     });
 });

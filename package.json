@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha src/*test.ts --exit",
+    "test": "PORT=3030 mocha src/*test.ts --exit",
     "dev": "nodemon src/index.ts"
   },
   "repository": {
