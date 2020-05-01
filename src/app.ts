@@ -3,7 +3,7 @@ import moment from 'moment';
 import nanoexpress from 'nanoexpress';
 import Nano from 'nano-date'
 
-import influx from './db/database';
+import influx, { GroupBy } from './db/database';
 import { MarketDataMeasurement } from './db/marketdata.schema';
 
 import { PORT, databaseName, appName, HOSTNAME } from './config';
@@ -21,21 +21,49 @@ app.get('/', function (req, res) {
     console.log('health check')
 })
 
+interface QueryMdata {
+    symbol: string;
+    startDate: Date;
+    endDate: Date;
+    range: GroupBy;
+}
+
 app.get('/v1/query', async function async(req, res) {
 
-    const { symbol = "AAPL", startDate, endDate, range } = req.params || {};
-    const curDate = new Date();
-    const cloneDate = new Date(curDate);
 
-    const startingDate = new Nano((new Date(cloneDate.setDate(cloneDate.getDate() - 1)))).full;
-    const endingDate = new Nano(curDate).full;
+    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range = "1h" }: QueryMdata = (req.query || {}) as any;
 
-    console.log('dates are', { startingDate, endingDate })
+    const startDate = new Date(startDateOg);
+
+    const { startingDate, endingDate } = (() => {
+
+        // if we have endDate
+        if (endDate) {
+            return {
+                endingDate: new Nano(new Date(endDate)).full,
+                startingDate: new Nano(new Date(startDate)).full,
+            }
+        }
+
+        // Else clone startDate, go back a day in the past and set as endingDate
+        const cloneStartDate = new Date(startDate);
+        let startingDate = new Nano((new Date(cloneStartDate.setDate(cloneStartDate.getDate() - 1)))).full;
+        let endingDate = new Nano(startDate).full;
+
+        return {
+            endingDate,
+            startingDate
+        }
+
+    })();
+
+    console.log('dates are', { startingDate, endingDate });
+
     const query = `
-    SELECT mean("close") AS "mean_close", mean("high") AS "mean_high", mean("low") AS "mean_low", mean("volume") AS "mean_volume", mean("open") AS "mean_open" 
+    SELECT mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
     FROM "exodus"."autogen"."market" 
     WHERE time > ${startingDate} AND time < ${endingDate} 
-    AND "symbol"='${symbol}' GROUP BY time(1m)`;
+    AND "symbol"='${symbol}' GROUP BY time(${range}) FILL(0)`;
 
     let data = [];
     try {
