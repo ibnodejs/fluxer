@@ -40,7 +40,7 @@ app.post('/v1/insert', function (req, res) {
                 {
                     measurement: MarketDataMeasurement,
                     fields: {
-                        symbol, open, high, low, close, volume
+                        open, high, low, close, volume
                     },
                     tags: {
                         symbol
@@ -58,7 +58,7 @@ app.post('/v1/insert', function (req, res) {
                 {
                     measurement: MarketDataMeasurement,
                     fields: {
-                        symbol, open, high, low, close, volume
+                        open, high, low, close, volume
                     },
                     tags: {
                         symbol
@@ -70,11 +70,13 @@ app.post('/v1/insert', function (req, res) {
 
     }
 
-    res.end();
-
     if (!isEmpty(items)) {
-        influx.writePoints(items)
+        res.json({ status: 200 })
+        return influx.writePoints(items)
     }
+
+    res.status(401);
+    res.end();
 
 })
 

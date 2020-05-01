@@ -9,6 +9,7 @@ export interface MarketDataSchema {
     low: number;
     close: number;
     volume: number;
+    date?: Date;
 };
 
 export const marketDataSchema: ISchemaOptions = {
