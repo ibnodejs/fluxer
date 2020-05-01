@@ -11,7 +11,7 @@ before(done => setTimeout(done, 1500)); // timeout for server to start
 const request = supertest(`http://127.0.0.1:${PORT}`);
 
 const object = {
-    symbol: "USO",
+    symbol: "TESTSYMBOL",
     open: 2,
     high: 3,
     low: 1,
@@ -70,7 +70,7 @@ describe(`Server ${appName}`, () => {
             .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)), range: '10m' })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect((res) => res.body != [])
+            .expect((res) => res.body.length)
             .expect(200, done);
     });
 });
