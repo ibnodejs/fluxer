@@ -23,7 +23,7 @@ app.get('/', function (req, res) {
 
 app.get('/v1/query', async function async(req, res) {
 
-    const { symbol = "AAPL", startDate, endDate, range } = req.params;
+    const { symbol = "AAPL", startDate, endDate, range } = req.params || {};
     const curDate = new Date();
     const cloneDate = new Date(curDate);
 
