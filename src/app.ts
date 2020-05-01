@@ -1,6 +1,4 @@
-import express from 'express';
 import influx from './db/database';
-import bodyParser from 'body-parser';
 import isEmpty from 'lodash/isEmpty';
 import { MarketDataMeasurement } from './db/marketdata.schema';
 import nanoexpress from 'nanoexpress';
@@ -31,11 +29,13 @@ app.post('/v1/insert', function (req, res) {
 
     const data = req && req.body;
 
+    const defaultTimestamp = new Date().getTime();
+
     const items: any = [];
 
     if (Array.isArray(data)) {
         data.map(item => {
-            const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = item as any;
+            const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item as any;
             items.push(
                 {
                     measurement: MarketDataMeasurement,
@@ -44,13 +44,14 @@ app.post('/v1/insert', function (req, res) {
                     },
                     tags: {
                         symbol
-                    }
+                    },
+                    timestamp: new Date(date).getTime()
                 }
             )
         })
     } else {
         const item = data as any;
-        const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0 } = item;
+        const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item;
 
         if (item && item.symbol) {
             items.push(
@@ -61,7 +62,8 @@ app.post('/v1/insert', function (req, res) {
                     },
                     tags: {
                         symbol
-                    }
+                    },
+                    timestamp: new Date(date).getTime()
                 }
             )
         }
