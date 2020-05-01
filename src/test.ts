@@ -65,4 +65,11 @@ describe(`Server ${appName}`, () => {
     });
 
     // query
+
+    it('should not insert empty market data item', function (done) {
+        request.get('/v1/query')
+            .send({})
+            .set('Accept', 'application/json')
+            .expect(200, done);
+    });
 });

@@ -1,7 +1,11 @@
-import influx from './db/database';
 import isEmpty from 'lodash/isEmpty';
-import { MarketDataMeasurement } from './db/marketdata.schema';
+import moment from 'moment';
 import nanoexpress from 'nanoexpress';
+import Nano from 'nano-date'
+
+import influx from './db/database';
+import { MarketDataMeasurement } from './db/marketdata.schema';
+
 import { PORT, databaseName, appName, HOSTNAME } from './config';
 // const app: express.Application = express()
 
@@ -17,12 +21,32 @@ app.get('/', function (req, res) {
     console.log('health check')
 })
 
-app.get('/v1/query', function (req, res) {
-    influx.query('select * from exodus_table')
-        .then(result => {
-            res.json(result)
-            res.end()
-        })
+app.get('/v1/query', async function async(req, res) {
+
+    const curDate = new Date();
+    const cloneDate = new Date(curDate);
+
+    const startingDate = new Nano((new Date(cloneDate.setDate(cloneDate.getDate() - 1)))).full;
+    const endingDate = new Nano(curDate).full;
+
+    console.log('dates are', { startingDate, endingDate })
+    const query = `
+    SELECT mean("close") AS "mean_close", mean("high") AS "mean_high", mean("low") AS "mean_low", mean("volume") AS "mean_volume", mean("open") AS "mean_open" 
+    FROM "exodus"."autogen"."market" 
+    WHERE time > ${startingDate} AND time < ${endingDate} 
+    AND "symbol"='AAPL' GROUP BY time(1m)`;
+
+    let data = [];
+    try {
+        data = await influx.query(query)
+    }
+    catch (error) {
+        console.log('error getting candles', error);
+    }
+    finally {
+        return res.json(data);
+    }
+
 })
 
 app.post('/v1/insert', function (req, res) {
@@ -92,7 +116,7 @@ export async function runApp(): Promise<boolean> {
 
         console.log(`Started ${appName} on ${PORT}`);
 
-        return true;
+        // return true;
         // setInterval(() => {
         //     influx.writePoints([
         //         {
@@ -105,6 +129,7 @@ export async function runApp(): Promise<boolean> {
         //                 close: count += 1,
         //                 volume: 1
         //             },
+        //             // timestamp: new Date().getTime(),
         //             tags: {
         //                 symbol: 'AAPL'
         //             }
@@ -113,6 +138,8 @@ export async function runApp(): Promise<boolean> {
         //     ])/*  */
         //     console.log('add values', count)
         // }, 500);
+
+        return true;
 
     }
     catch (error) {
