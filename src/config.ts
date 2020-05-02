@@ -19,3 +19,4 @@ export const appName = env.APP_NAME || 'EXODUS';
  */
 export const databaseName = env.APP_DB || 'stoqey';
 export const influxDbHost: string = (env.INFLUX_HOST || 'localhost');
+export const demoInsert = env.DEMO_INSERT;
