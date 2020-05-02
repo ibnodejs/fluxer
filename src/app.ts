@@ -98,7 +98,7 @@ app.post('/v1/insert', function (req, res) {
                     tags: {
                         symbol
                     },
-                    timestamp: new Date(date).getTime()
+                    timestamp: new Nano(new Date(date)).full
                 }
             )
         })
@@ -116,7 +116,7 @@ app.post('/v1/insert', function (req, res) {
                     tags: {
                         symbol
                     },
-                    timestamp: new Date(date).getTime()
+                    timestamp: new Nano(new Date(date)).full
                 }
             )
         }
