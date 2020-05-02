@@ -1,11 +1,14 @@
 {
   "name": "exodus",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "PORT=3030 mocha src/*test.ts --exit",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "clean": "rm -rf build",
+    "build": "yarn clean && tsc",
+    "serve": "NODE_ENV=production node build"
   },
   "repository": {
     "type": "git",
@@ -35,11 +38,12 @@
   },
   "dependencies": {
     "@types/express": "^4.17.6",
+    "ajv": "^6.12.2",
     "dotenv": "^8.2.0",
     "influx": "^5.5.1",
     "lodash": "^4.17.15",
     "moment": "2.24.0",
     "nano-date": "^4.1.0",
-    "nanoexpress": "^2.0.2"
+    "nanoexpress": "2.0.0"
   }
 }

@@ -6,7 +6,7 @@ import Nano from 'nano-date'
 import influx, { GroupBy } from './db/database';
 import { MarketDataMeasurement } from './db/marketdata.schema';
 
-import { PORT, databaseName, appName, HOSTNAME } from './config';
+import { PORT, databaseName, appName, HOSTNAME, demoInsert } from './config';
 // const app: express.Application = express()
 
 const app = nanoexpress();
@@ -140,33 +140,36 @@ export async function runApp(): Promise<boolean> {
         const names = await influx.getDatabaseNames();
         if (!names.includes(databaseName)) {
             await influx.createDatabase(databaseName)
+            console.log(`Database created ========> ${databaseName}`);
         }
         await app.listen(PORT);
 
         console.log(`Started ${appName} on ${PORT}`);
 
-        // return true;
-        // setInterval(() => {
-        //     influx.writePoints([
-        //         {
-        //             measurement: MarketDataMeasurement,
-        //             fields: {
-        //                 // symbol: "AAPL",
-        //                 open: 1.1,
-        //                 high: 1.1,
-        //                 low: 1.1,
-        //                 close: count += 1,
-        //                 volume: 1
-        //             },
-        //             // timestamp: new Date().getTime(),
-        //             tags: {
-        //                 symbol: 'AAPL'
-        //             }
+        if (demoInsert) {
+            setInterval(() => {
+                influx.writePoints([
+                    {
+                        measurement: MarketDataMeasurement,
+                        fields: {
+                            // symbol: "AAPL",
+                            open: 1.1,
+                            high: 1.1,
+                            low: 1.1,
+                            close: count += 1,
+                            volume: 1
+                        },
+                        // timestamp: new Date().getTime(),
+                        tags: {
+                            symbol: 'UNKNOWN'
+                        }
 
-        //         }
-        //     ])/*  */
-        //     console.log('add values', count)
-        // }, 500);
+                    }
+                ])/*  */
+                console.log('add values', count)
+            }, 1000);
+        }
+
 
         return true;
 
