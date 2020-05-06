@@ -7,6 +7,7 @@ import influx, { GroupBy } from './db/database';
 import { MarketDataMeasurement } from './db/marketdata.schema';
 
 import { PORT, databaseName, appName, HOSTNAME, demoInsert } from './config';
+import { IPoint } from 'influx';
 // const app: express.Application = express()
 
 const app = nanoexpress();
@@ -80,56 +81,69 @@ app.get('/v1/query', async function async(req, res) {
 
 app.post('/v1/insert', function (req, res) {
 
+    console.log('v1/insert');
+
     const data = req && req.body;
 
-    const defaultTimestamp = new Date().getTime();
+    const defaultTimestamp = new Date();
 
-    const items: any = [];
+    const items: IPoint[] = [];
 
-    if (Array.isArray(data)) {
-        data.map(item => {
-            const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item as any;
-            items.push(
-                {
-                    measurement: MarketDataMeasurement,
-                    fields: {
-                        open, high, low, close, volume
-                    },
-                    tags: {
-                        symbol
-                    },
-                    timestamp: new Nano(new Date(date)).full
-                }
-            )
-        })
-    } else {
-        const item = data as any;
-        const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item;
+    try {
 
-        if (item && item.symbol) {
-            items.push(
-                {
-                    measurement: MarketDataMeasurement,
-                    fields: {
-                        open, high, low, close, volume
-                    },
-                    tags: {
-                        symbol
-                    },
-                    timestamp: new Nano(new Date(date)).full
-                }
-            )
+        if (Array.isArray(data)) {
+            data.map(item => {
+                const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item as any;
+                items.push(
+                    {
+                        measurement: MarketDataMeasurement,
+                        fields: {
+                            open, high, low, close, volume
+                        },
+                        tags: {
+                            symbol
+                        },
+                        timestamp: new Date(date)
+                    }
+                )
+            })
+        } else {
+            const item = data as any;
+            const { symbol = "UNKNOWN", open = 0, high = 0, low = 0, close = 0, volume = 0, date = defaultTimestamp } = item;
+
+            if (item && item.symbol) {
+                items.push(
+                    {
+                        measurement: MarketDataMeasurement,
+                        fields: {
+                            open, high, low, close, volume
+                        },
+                        tags: {
+                            symbol
+                        },
+                        timestamp: new Date(date)
+                    }
+                )
+            }
+
         }
 
+        if (!isEmpty(items)) {
+            influx.writePoints(items)
+            return res.json({ status: 200 })
+        }
+
+        res.status(401);
+        res.end();
+
+    }
+    catch (error) {
+        console.log('error inserting items into influxDB', error);
+        res.status(401);
+        res.end();
     }
 
-    if (!isEmpty(items)) {
-        res.json({ status: 200 })
-        return influx.writePoints(items)
-    }
 
-    res.status(401);
-    res.end();
 
 })
 
