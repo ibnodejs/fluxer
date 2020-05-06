@@ -31,7 +31,7 @@ interface QueryMdata {
 app.get('/v1/query', async function async(req, res) {
 
 
-    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range = "1h" }: QueryMdata = (req.query || {}) as any;
+    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range }: QueryMdata = (req.query || {}) as any;
 
     const startDate = new Date(startDateOg);
 
@@ -63,7 +63,7 @@ app.get('/v1/query', async function async(req, res) {
     SELECT mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
     FROM "exodus"."autogen"."market" 
     WHERE time > ${startingDate} AND time < ${endingDate} 
-    AND "symbol"='${symbol}' GROUP BY time(${range}) FILL(0)`;
+    AND "symbol"='${symbol}' ${range ? `GROUP BY time(${range})` : ''} FILL(0)`;
 
     let data = [];
     try {

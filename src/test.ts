@@ -73,4 +73,15 @@ describe(`Server ${appName}`, () => {
             .expect((res) => res.body.length)
             .expect(200, done);
     });
+
+    // query
+    it('should query market data items without range', function (done) {
+        const cur = new Date();
+        request.get('/v1/query')
+            .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)) })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect((res) => res.body.length)
+            .expect(200, done);
+    });
 });
