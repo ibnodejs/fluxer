@@ -79,17 +79,14 @@ app.get('/v1/query', async function async(req, res) {
 
 })
 
-app.post('/v1/insert', function (req, res) {
-
-    console.log('v1/insert');
-
+app.post('/v1/insert', async function (req, res) {
     const data = req && req.body;
-
     const defaultTimestamp = new Date();
-
     const items: IPoint[] = [];
 
     try {
+
+
 
         if (Array.isArray(data)) {
             data.map(item => {
@@ -129,8 +126,9 @@ app.post('/v1/insert', function (req, res) {
         }
 
         if (!isEmpty(items)) {
-            influx.writePoints(items)
-            return res.json({ status: 200 })
+            res.json({ status: 200 }); // non blocking
+            await influx.writePoints(items)
+            return console.log(`${JSON.stringify(items[0].tags)} ---> `, items.length)
         }
 
         res.status(401);
