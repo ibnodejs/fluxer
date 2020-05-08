@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import moment from 'moment';
 import nanoexpress from 'nanoexpress';
 import Nano from 'nano-date'
-
+import './sentry';
 import influx, { GroupBy } from './db/database';
 import { MarketDataMeasurement } from './db/marketdata.schema';
 
