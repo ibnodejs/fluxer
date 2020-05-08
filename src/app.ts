@@ -63,7 +63,7 @@ app.get('/v1/query', async function async(req, res) {
     console.log('dates are', { startingDate, endingDate });
 
     const query = `
-    SELECT mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
+    SELECT time AS date, mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
     FROM "${databaseName}"."autogen"."market" 
     WHERE time > ${startingDate} AND time < ${endingDate} AND close != 0
     AND "symbol"='${symbol}' ${range ? `GROUP BY time(${range})` : 'GROUP BY TIME(1m)'} ${fill ? `fill(${fill})` : `fill(none)`} `;
