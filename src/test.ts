@@ -10,6 +10,8 @@ before(done => setTimeout(done, 1500)); // timeout for server to start
 
 const request = supertest(`http://127.0.0.1:${PORT}`);
 
+const currentDate = new Date('05-07-2020');
+
 const object = {
     symbol: "TESTSYMBOL",
     open: 2,
@@ -17,7 +19,7 @@ const object = {
     low: 1,
     close: 2,
     volume: 100,
-    date: new Date(),
+    date: currentDate,
 };
 
 const arr = [object];
@@ -65,9 +67,9 @@ describe(`Server ${appName}`, () => {
 
     // query
     it('should query market data item', function (done) {
-        const cur = new Date();
+        const cur = new Date(currentDate);
         request.get('/v1/query')
-            .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)), range: '10m' })
+            .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)).toISOString(), range: '10m' })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect((res) => res.body.length)
@@ -76,9 +78,19 @@ describe(`Server ${appName}`, () => {
 
     // query
     it('should query market data items without range', function (done) {
-        const cur = new Date();
+        const cur = new Date(currentDate);
         request.get('/v1/query')
             .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)) })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect((res) => res.body.length)
+            .expect(200, done);
+    });
+
+    it('should query market data items without range', function (done) {
+        const cur = new Date(currentDate);
+        request.get('/v1/query')
+            .query({ symbol: object.symbol, startDate: new Date(cur.setDate(cur.getDate() - 1)), endDate: new Date(currentDate) })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect((res) => res.body.length)

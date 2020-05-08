@@ -27,13 +27,15 @@ interface QueryMdata {
     startDate: Date;
     endDate: Date;
     range: GroupBy;
+    fill?: 'none' | null | 0
 }
 
 app.get('/v1/query', async function async(req, res) {
 
 
-    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range }: QueryMdata = (req.query || {}) as any;
+    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range, fill }: QueryMdata = (req.query || {}) as any;
 
+    console.log('query', req.query);
     const startDate = new Date(startDateOg);
 
     const { startingDate, endingDate } = (() => {
@@ -62,18 +64,23 @@ app.get('/v1/query', async function async(req, res) {
 
     const query = `
     SELECT mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
-    FROM "exodus"."autogen"."market" 
-    WHERE time > ${startingDate} AND time < ${endingDate} 
-    AND "symbol"='${symbol}' ${range ? `GROUP BY time(${range})` : ''} FILL(0)`;
+    FROM "${databaseName}"."autogen"."market" 
+    WHERE time > ${startingDate} AND time < ${endingDate} AND close != 0
+    AND "symbol"='${symbol}' ${range ? `GROUP BY time(${range})` : 'GROUP BY TIME(1m)'} ${fill ? `fill(${fill})` : `fill(none)`} `;
 
     let data = [];
     try {
         data = await influx.query(query)
+        console.log('data response is', data && data.length);
+        if (isEmpty(data)) {
+            throw new Error('Error market data null');
+        }
     }
     catch (error) {
         console.log('error getting candles', error);
     }
     finally {
+
         return res.json(data);
     }
 
