@@ -33,7 +33,7 @@ interface QueryMdata {
 app.get('/v1/query', async function async(req, res) {
 
 
-    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate = new Date, range, fill }: QueryMdata = (req.query || {}) as any;
+    const { symbol = "AAPL", startDate: startDateOg = new Date, endDate, range, fill }: QueryMdata = (req.query || {}) as any;
 
     console.log('query', req.query);
     const startDate = new Date(startDateOg);
