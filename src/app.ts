@@ -5,6 +5,7 @@ import Nano from 'nano-date'
 import './sentry';
 import influx, { GroupBy } from './db/database';
 import { MarketDataMeasurement } from './db/marketdata.schema';
+import { log } from './log';
 
 import { PORT, databaseName, appName, HOSTNAME, demoInsert } from './config';
 import { IPoint } from 'influx';
@@ -19,7 +20,7 @@ app.get('/', function (req, res) {
         date: new Date
     })
 
-    console.log('health check')
+    log('health check')
 })
 
 interface QueryMdata {
@@ -35,7 +36,7 @@ app.get('/v1/query', async function async(req, res) {
 
     const { symbol = "AAPL", startDate: startDateOg = new Date, endDate, range, fill }: QueryMdata = (req.query || {}) as any;
 
-    console.log('query', req.query);
+    log('query', req.query);
     const startDate = new Date(startDateOg);
 
     const { startingDate, endingDate } = (() => {
@@ -60,7 +61,7 @@ app.get('/v1/query', async function async(req, res) {
 
     })();
 
-    console.log('dates are', { startingDate, endingDate });
+    log('dates are', { startingDate, endingDate });
 
     const query = `
     SELECT time AS date, mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
@@ -71,13 +72,13 @@ app.get('/v1/query', async function async(req, res) {
     let data = [];
     try {
         data = await influx.query(query)
-        console.log('data response is', data && data.length);
+        log('data response is', data && data.length);
         if (isEmpty(data)) {
             throw new Error('Error market data null');
         }
     }
     catch (error) {
-        console.log('error getting candles', error);
+        log('error getting candles', error);
     }
     finally {
 
@@ -135,7 +136,7 @@ app.post('/v1/insert', async function (req, res) {
         if (!isEmpty(items)) {
             res.json({ status: 200 }); // non blocking
             await influx.writePoints(items)
-            return console.log(`${JSON.stringify(items[0].tags)} ---> `, items.length)
+            return log(`${JSON.stringify(items[0].tags)} ---> `, items.length)
         }
 
         res.status(401);
@@ -143,7 +144,7 @@ app.post('/v1/insert', async function (req, res) {
 
     }
     catch (error) {
-        console.log('error inserting items into influxDB', error);
+        log('error inserting items into influxDB', error);
         res.status(401);
         res.end();
     }
@@ -159,11 +160,11 @@ export async function runApp(): Promise<boolean> {
         const names = await influx.getDatabaseNames();
         if (!names.includes(databaseName)) {
             await influx.createDatabase(databaseName)
-            console.log(`Database created ========> ${databaseName}`);
+            log(`Database created ========> ${databaseName}`);
         }
         await app.listen(PORT);
 
-        console.log(`Started ${appName} on ${PORT}`);
+        log(`Started ${appName} on ${PORT}`);
 
         if (demoInsert) {
             setInterval(() => {
@@ -185,7 +186,7 @@ export async function runApp(): Promise<boolean> {
 
                     }
                 ])/*  */
-                console.log('add values', count)
+                log('add values', count)
             }, 1000);
         }
 
@@ -194,7 +195,7 @@ export async function runApp(): Promise<boolean> {
 
     }
     catch (error) {
-        console.log('error running app', error && error.message);
+        log('error running app', error && error.message);
         console.error(error)
         process.exit(1);
     }
