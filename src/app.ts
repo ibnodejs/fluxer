@@ -1,5 +1,4 @@
 import isEmpty from 'lodash/isEmpty';
-import moment from 'moment';
 import nanoexpress from 'nanoexpress';
 import Nano from 'nano-date'
 import './sentry';
@@ -9,7 +8,6 @@ import { log } from './log';
 
 import { PORT, databaseName, appName, HOSTNAME, demoInsert } from './config';
 import { IPoint } from 'influx';
-// const app: express.Application = express()
 
 const app = nanoexpress();
 
@@ -93,8 +91,6 @@ app.post('/v1/insert', async function (req, res) {
     const items: IPoint[] = [];
 
     try {
-
-
 
         if (Array.isArray(data)) {
             data.map(item => {
