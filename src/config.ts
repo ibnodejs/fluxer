@@ -20,4 +20,6 @@ export const appName = env.APP_NAME || 'EXODUS';
 export const databaseName = env.APP_DB || 'stoqey';
 export const influxDbPort: number = +(env.INFLUX_PORT || 8086);
 export const influxDbHost: string = (env.INFLUX_HOST || 'localhost');
+export const influxDbUser = env.INFLUX_USER;
+export const influxDbPass = env.INFLUX_PASS;
 export const demoInsert = env.DEMO_INSERT;
