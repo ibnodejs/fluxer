@@ -6,6 +6,7 @@
   "scripts": {
     "test": "PORT=3030 mocha src/*test.ts --exit",
     "dev": "nodemon src/index.ts",
+    "pm2": "pm2 start src/index.ts --watch --name exodus",
     "clean": "rm -rf build",
     "build": "yarn clean && tsc",
     "serve": "NODE_ENV=production node build"
