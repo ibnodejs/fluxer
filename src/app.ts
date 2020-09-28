@@ -38,7 +38,7 @@ app.get("/v1/query", async function async(req, res) {
   }: QueryMdata = (req.query || {}) as any;
 
   log("query", req.query);
-  const startDate: Date = endDate ? new Date(startDateOg) : new Date();
+  const startDate = new Date(startDateOg);
 
   const { startingDate, endingDate } = (() => {
     // if we have endDate
