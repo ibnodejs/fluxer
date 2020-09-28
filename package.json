@@ -43,7 +43,7 @@
     "ajv": "^6.12.2",
     "dotenv": "^8.2.0",
     "influx": "^5.5.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "moment": "2.24.0",
     "nano-date": "^4.1.0",
     "nanoexpress": "2.0.0"
