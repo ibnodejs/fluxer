@@ -54,6 +54,16 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
+"@influxdata/influxdb-client-apis@^1.21.0":
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/@influxdata/influxdb-client-apis/-/influxdb-client-apis-1.21.0.tgz#44ee99ead6dc3fe685954b6afb3d1a9f34ade488"
+  integrity sha512-/fp2d8NbE9TaUltuWEEeLUWe8Hz/PhO/BVxrAS6PF+oJI1Eeukb/j0AZ+bJyiU2oZxiTFNDPquDzOAPex8CD7w==
+
+"@influxdata/influxdb-client@^1.21.0":
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/@influxdata/influxdb-client/-/influxdb-client-1.21.0.tgz#4d0f10db42daabf84bfa7e58ef22732ff692ad9d"
+  integrity sha512-QdugX4vGFAqO43rTMfPxR4VUrEttXk6X3mZT+edcVOmIXKiJqlg4WCj7eBxJMayAs7RqDIDWRGJVGz7OC497PA==
+
 "@sentry/apm@5.15.5":
   version "5.15.5"
   resolved "https://registry.yarnpkg.com/@sentry/apm/-/apm-5.15.5.tgz#dc0515f16405de52b3ba0d26f8a6dc2fcefe5fcc"

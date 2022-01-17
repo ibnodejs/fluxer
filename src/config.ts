@@ -1,10 +1,10 @@
-import os from 'os';
-require('dotenv').config();
+import os from "os";
+require("dotenv").config();
 
 const { env } = process;
 
 // env
-export const isDev = env.NODE_ENV !== 'production';
+export const isDev = env.NODE_ENV !== "production";
 
 export const HOSTNAME = os.hostname();
 
@@ -12,14 +12,14 @@ export const HOSTNAME = os.hostname();
  * server env
  */
 export const PORT = +(env.PORT || 3009);
-export const appName = env.APP_NAME || 'EXODUS';
+export const appName = env.APP_NAME || "FLUXER";
 
 /**
  * Influx config
  */
-export const databaseName = env.APP_DB || 'stoqey';
-export const influxDbPort: number = +(env.INFLUX_PORT || 8086);
-export const influxDbHost: string = (env.INFLUX_HOST || 'localhost');
-export const influxDbUser = env.INFLUX_USER;
-export const influxDbPass = env.INFLUX_PASS;
 export const demoInsert = env.DEMO_INSERT;
+
+export const url = process.env.INFLUX_URL || "";
+export const token = process.env.INFLUX_TOKEN;
+export const org = process.env.INFLUX_ORG || "";
+export const bucket = process.env.INFLUX_BUCKET || "dev";

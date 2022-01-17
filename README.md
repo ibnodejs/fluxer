@@ -1,9 +1,11 @@
-<h1 align="center">Exodus 📖</h1>
+<h1 align="center">Fluxer</h1>
 <h4 align="center">The Book of MarketData</h4>
 
 <p align="center"> <img src="./docs/mkd.png"></img></p>
 
-Small server that saves market data to influx
+This project is migrated from Exodus, an old app based on InfluxDB v1.
+
+This one focuses on InfluxDB v2, mainly the Influx Cloud.
 
 ### Install
 ```
