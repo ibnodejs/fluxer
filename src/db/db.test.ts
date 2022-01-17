@@ -40,6 +40,4 @@ describe("Fluxer V2", () => {
     console.log("sample results points are", sampleData);
     expect(samplesResults.length).to.be.greaterThan(1);
   });
-
-  //   it("should query some data", async () => {});
 });

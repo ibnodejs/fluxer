@@ -22,9 +22,10 @@ export const writeMeasurement = async (
       new Point(MarketDataMeasurement)
         .tag("symbol", pointx.symbol)
         .floatField("open", pointx.open)
-        .floatField("open", pointx.open)
-        .floatField("low", pointx.low)
         .floatField("close", pointx.close)
+        .floatField("high", pointx.high)
+        .floatField("low", pointx.low)
+        .floatField("volume", pointx.volume)
         .timestamp(new Date(pointx.date))
     );
 
