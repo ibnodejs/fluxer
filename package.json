@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db": "mocha src/db/*test.ts --exit",
     "test": "PORT=3030 mocha src/*test.ts --exit",
     "dev": "nodemon src/index.ts",
     "pm2": "pm2 start src/index.ts --watch --name exodus",
