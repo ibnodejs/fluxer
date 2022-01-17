@@ -21,7 +21,6 @@ export const writeMeasurement = async (
     const points = data.map((pointx) =>
       new Point(MarketDataMeasurement)
         .tag("symbol", pointx.symbol)
-        .stringField("symbol", pointx.symbol)
         .floatField("open", pointx.open)
         .floatField("open", pointx.open)
         .floatField("low", pointx.low)
