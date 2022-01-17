@@ -2,6 +2,7 @@ import "mocha";
 
 import { MarketDataSchema } from "./marketdata.schema";
 import { expect } from "chai";
+import { queryMeasurement } from "./query";
 import { writeMeasurement } from "./write";
 
 const sampleData: MarketDataSchema[] = [
@@ -35,9 +36,21 @@ const sampleData: MarketDataSchema[] = [
 ];
 
 describe("Fluxer V2", () => {
-  it("should write some sample data", async () => {
-    const samplesResults = await writeMeasurement(sampleData);
-    console.log("sample results points are", sampleData);
-    expect(samplesResults.length).to.be.greaterThan(1);
+  // it("should write some sample data", async () => {
+  //   const samplesResults = await writeMeasurement(sampleData);
+  //   console.log("sample results points are", sampleData);
+  //   expect(samplesResults.length).to.be.greaterThan(1);
+  // });
+
+  it("it should query for some measurements", async () => {
+    const query = await queryMeasurement({
+      symbol: "stq",
+      startingDate: sampleData[0].date,
+      endingDate: sampleData[2].date,
+    });
+
+    console.log("results are", query);
+
+    expect(query).to.be.not.undefined;
   });
 });

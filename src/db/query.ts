@@ -23,22 +23,11 @@ export const queryMeasurement = async ({
   startingDate,
   endingDate,
   measurement = MarketDataMeasurement,
-}: QueryArgs): Promise<MarketDataSchema[] | void> => {
+}: QueryArgs): Promise<MarketDataSchema[]> => {
   const queryApi = influxDB.getQueryApi(org);
 
-  /**
-   Old query
-   const query = `
-    SELECT time AS date, mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
-    FROM "${databaseName}"."autogen"."market" 
-    WHERE time > ${startingDate} AND time < ${endingDate} AND close != 0
-    AND "symbol"='${symbol}' ${
-    range ? `GROUP BY time(${range})` : "GROUP BY TIME(1m)"
-  } ${fill ? `fill(${fill})` : `fill(none)`} `;
-
-   */
   const fluxQuery = `from(bucket:"${bucket}") 
-  |> range(start: ${startingDate}, stop: ${endingDate}) 
+  |> range(start: ${startingDate.toISOString()}, stop: ${endingDate.toISOString()}) 
   |> filter(
             fn: (r) => 
                 r._measurement == "${measurement}" and
@@ -49,33 +38,34 @@ export const queryMeasurement = async ({
    |> distinct()
   `;
 
-  const data: MarketDataSchema[] = [];
+  return new Promise((resolve, reject) => {
+    const data: MarketDataSchema[] = [];
 
-  const fluxObserver = {
-    next(row, tableMeta) {
-      const o = tableMeta.toObject(row);
+    const fluxObserver = {
+      next(row, tableMeta) {
+        const o = tableMeta.toObject(row);
 
-      data.push({
-        symbol: o.symbol,
-        open: o.open,
-        high: o.high,
-        low: o.low,
-        close: o.close,
-        volume: o.volume,
-        date: new Date(o._time),
-      });
-    },
-    error(error) {
-      console.error(error);
-      console.log("\nFinished ERROR");
-      throw error;
-    },
-    complete() {
-      console.log("\nFinished SUCCESS");
-      Promise.resolve(data);
-    },
-  };
+        data.push({
+          symbol: o.symbol,
+          open: o.open,
+          high: o.high,
+          low: o.low,
+          close: o.close,
+          volume: o.volume,
+          date: new Date(o._time),
+        });
+      },
+      error(error) {
+        console.error(error);
+        console.log("\nFinished ERROR");
+        reject(error);
+      },
+      complete() {
+        console.log("\nFinished SUCCESS");
+        resolve(data);
+      },
+    };
 
-  /** Execute a query and receive line table metadata and rows. */
-  queryApi.queryRows(fluxQuery, fluxObserver);
+    queryApi.queryRows(fluxQuery, fluxObserver);
+  });
 };
