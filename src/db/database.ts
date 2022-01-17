@@ -1,5 +1,4 @@
-// import { marketDataSchema } from "./marketdata.schema";
-import { bucket, org, token, url } from "../config";
+import { token, url } from "../config";
 
 import { InfluxDB } from "@influxdata/influxdb-client";
 

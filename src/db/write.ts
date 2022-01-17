@@ -25,6 +25,7 @@ export const writeMeasurement = async (
         .floatField("open", pointx.open)
         .floatField("low", pointx.low)
         .floatField("close", pointx.close)
+        .timestamp(new Date(pointx.date))
     );
 
     writeApi.writePoints(points);
