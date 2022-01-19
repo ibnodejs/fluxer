@@ -6,6 +6,7 @@ import { bucket, org } from "../config";
  */
 import { Point } from "@influxdata/influxdb-client";
 import { influxDB } from "./database";
+import { values } from "lodash";
 
 interface QueryArgs {
   symbol: string;
@@ -26,43 +27,42 @@ export const queryMeasurement = async ({
 }: QueryArgs): Promise<MarketDataSchema[]> => {
   const queryApi = influxDB.getQueryApi(org);
 
-  const fluxQuery = `from(bucket:"${bucket}") 
-  |> range(start: ${startingDate.toISOString()}, stop: ${endingDate.toISOString()}) 
-  |> filter(
-            fn: (r) => 
-                r._measurement == "${measurement}" and
-                r.symbol == "${symbol}",
-            onEmpty: "keep"
-        )
-   |> fill(value: 0.0)
-   |> distinct()
+  const fluxQuery = `
+  from(bucket: "${bucket}")
+  |> range(start: ${startingDate.toISOString()}, stop: ${endingDate.toISOString()})
+  |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+  |> filter(fn: (r) => r["symbol"] == "${symbol}")
+  |> group(columns: ["_time"])
+  |> yield()
   `;
 
   return new Promise((resolve, reject) => {
-    const data: MarketDataSchema[] = [];
+    let table: { [x: string]: any } = {};
 
     const fluxObserver = {
       next(row, tableMeta) {
         const o = tableMeta.toObject(row);
-
-        data.push({
-          symbol: o.symbol,
-          open: o.open,
-          high: o.high,
-          low: o.low,
-          close: o.close,
-          volume: o.volume,
-          date: new Date(o._time),
-        });
+        const time = o._time;
+        if (table[time]) {
+          // exists, just append
+          table[time] = {
+            ...table[time],
+            [o._field]: o._value,
+          };
+        } else {
+          // create a new table
+          table[time] = {
+            date: new Date(time), // with date object
+            [o._field]: o._value,
+          };
+        }
       },
       error(error) {
         console.error(error);
-        console.log("\nFinished ERROR");
         reject(error);
       },
       complete() {
-        console.log("\nFinished SUCCESS");
-        resolve(data);
+        resolve(values(table));
       },
     };
 
