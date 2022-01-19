@@ -1,6 +1,6 @@
-import debug from 'debug';
+import debug from "debug";
 
-const prefix = 'exodus';
+const prefix = "fluxer";
 
 /**
  * Use to log in general case

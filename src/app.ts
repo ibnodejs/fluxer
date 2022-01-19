@@ -1,18 +1,23 @@
 import "./sentry";
 
-import { HOSTNAME, PORT, appName } from "./config";
+import { HOSTNAME, PORT, appName, bucket, org, url } from "./config";
 import {
   MarketDataMeasurement,
   MarketDataSchema,
 } from "./db/marketdata.schema";
 
+import { influxDB } from "./db/database";
 import isEmpty from "lodash/isEmpty";
 import { log } from "./log";
 import nanoexpress from "nanoexpress";
 import { queryMeasurement } from "./db/query";
 import { writeMeasurement } from "./db/write";
 
+const bodyParser = require("@nanoexpress/middleware-body-parser/cjs");
+
 const app = nanoexpress();
+
+app.use(bodyParser());
 
 app.get("/", function (req, res) {
   res.json({
@@ -139,8 +144,7 @@ app.post("/v1/insert", async function (req, res) {
       return log(`${JSON.stringify(items[0])} ---> `, items.length);
     }
 
-    res.status(401);
-    res.end();
+    throw new Error("items are empty");
   } catch (error) {
     log("error inserting items into influxDB", error);
     res.status(401);
@@ -152,6 +156,8 @@ export async function runApp(): Promise<boolean> {
   try {
     await app.listen(PORT);
     log(`Started ${appName} on ${PORT}`);
+    log("started server with bucket", { bucket, org, url });
+
     return true;
   } catch (error) {
     log("error running app", error);
