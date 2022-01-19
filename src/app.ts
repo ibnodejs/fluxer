@@ -153,8 +153,8 @@ export async function runApp(): Promise<boolean> {
     await app.listen(PORT);
     log(`Started ${appName} on ${PORT}`);
     return true;
-  } catch (error: any) {
-    log("error running app", error && error.message);
+  } catch (error) {
+    log("error running app", error);
     console.error(error);
     process.exit(1);
   }
