@@ -1,13 +1,16 @@
-import isEmpty from "lodash/isEmpty";
-import nanoexpress from "nanoexpress";
-import Nano from "nano-date";
 import "./sentry";
-import influx, { GroupBy } from "./db/database";
-import { MarketDataMeasurement } from "./db/marketdata.schema";
-import { log } from "./log";
 
-import { PORT, databaseName, appName, HOSTNAME, demoInsert } from "./config";
-import { IPoint } from "influx";
+import { HOSTNAME, PORT, appName } from "./config";
+import {
+  MarketDataMeasurement,
+  MarketDataSchema,
+} from "./db/marketdata.schema";
+
+import isEmpty from "lodash/isEmpty";
+import { log } from "./log";
+import nanoexpress from "nanoexpress";
+import { queryMeasurement } from "./db/query";
+import { writeMeasurement } from "./db/write";
 
 const app = nanoexpress();
 
@@ -22,19 +25,15 @@ app.get("/", function (req, res) {
 
 interface QueryMdata {
   symbol: string;
-  startDate: Date;
-  endDate: Date;
-  range: GroupBy;
-  fill?: "none" | null | 0;
+  start: Date;
+  end: Date;
 }
 
 app.get("/v1/query", async function async(req, res) {
   const {
     symbol = "AAPL",
-    startDate: startDateOg = new Date(),
-    endDate,
-    range,
-    fill,
+    start: startDateOg = new Date(),
+    end,
   }: QueryMdata = (req.query || {}) as any;
 
   log("query", req.query);
@@ -42,19 +41,19 @@ app.get("/v1/query", async function async(req, res) {
 
   const { startingDate, endingDate } = (() => {
     // if we have endDate
-    if (endDate) {
+    if (end) {
       return {
-        endingDate: new Nano(new Date(endDate)).full,
-        startingDate: new Nano(new Date(startDate)).full,
+        endingDate: new Date(end),
+        startingDate: new Date(startDate),
       };
     }
 
     // Else clone startDate, go back a day in the past and set as endingDate
     const cloneStartDate = new Date(startDate);
-    let startingDate = new Nano(
-      new Date(cloneStartDate.setDate(cloneStartDate.getDate() - 1))
-    ).full;
-    let endingDate = new Nano(startDate).full;
+    let startingDate = new Date(
+      cloneStartDate.setDate(cloneStartDate.getDate() - 1)
+    );
+    let endingDate = startDate;
 
     return {
       endingDate,
@@ -64,17 +63,9 @@ app.get("/v1/query", async function async(req, res) {
 
   log("dates are", { startingDate, endingDate });
 
-  const query = `
-    SELECT time AS date, mean("close") AS "close", mean("high") AS "high", mean("low") AS "low", mean("volume") AS "volume", mean("open") AS "open" 
-    FROM "${databaseName}"."autogen"."market" 
-    WHERE time > ${startingDate} AND time < ${endingDate} AND close != 0
-    AND "symbol"='${symbol}' ${
-    range ? `GROUP BY time(${range})` : "GROUP BY TIME(1m)"
-  } ${fill ? `fill(${fill})` : `fill(none)`} `;
-
-  let data = [];
+  let data: MarketDataSchema[] = [];
   try {
-    data = await influx.query(query);
+    data = await queryMeasurement({ symbol, startingDate, endingDate });
     log("data response is", data && data.length);
     if (isEmpty(data)) {
       throw new Error("Error market data null");
@@ -89,11 +80,13 @@ app.get("/v1/query", async function async(req, res) {
 app.post("/v1/insert", async function (req, res) {
   const data = req && req.body;
   const defaultTimestamp = new Date();
-  const items: IPoint[] = [];
+  const items: MarketDataSchema[] = [];
 
   try {
+    // If is array
     if (Array.isArray(data)) {
       data.map((item) => {
+        // Init with defaults
         const {
           symbol = "UNKNOWN",
           open = 0,
@@ -102,23 +95,20 @@ app.post("/v1/insert", async function (req, res) {
           close = 0,
           volume = 0,
           date = defaultTimestamp,
-        } = item as any;
+        } = item as MarketDataSchema;
+
         items.push({
-          measurement: MarketDataMeasurement,
-          fields: {
-            open,
-            high,
-            low,
-            close,
-            volume,
-          },
-          tags: {
-            symbol,
-          },
-          timestamp: new Date(date),
+          open,
+          high,
+          low,
+          close,
+          volume,
+          symbol,
+          date: new Date(date),
         });
       });
     } else {
+      // Single object
       const item = data as any;
       const {
         symbol = "UNKNOWN",
@@ -132,26 +122,21 @@ app.post("/v1/insert", async function (req, res) {
 
       if (item && item.symbol) {
         items.push({
-          measurement: MarketDataMeasurement,
-          fields: {
-            open,
-            high,
-            low,
-            close,
-            volume,
-          },
-          tags: {
-            symbol,
-          },
-          timestamp: new Date(date),
+          open,
+          high,
+          low,
+          close,
+          volume,
+          symbol,
+          date: new Date(date),
         });
       }
     }
 
     if (!isEmpty(items)) {
       res.json({ status: 200 }); // non blocking
-      await influx.writePoints(items);
-      return log(`${JSON.stringify(items[0].tags)} ---> `, items.length);
+      await writeMeasurement(items);
+      return log(`${JSON.stringify(items[0])} ---> `, items.length);
     }
 
     res.status(401);
@@ -165,41 +150,10 @@ app.post("/v1/insert", async function (req, res) {
 
 export async function runApp(): Promise<boolean> {
   try {
-    let count = 0;
-    const names = await influx.getDatabaseNames();
-    if (!names.includes(databaseName)) {
-      await influx.createDatabase(databaseName);
-      log(`Database created ========> ${databaseName}`);
-    }
     await app.listen(PORT);
-
     log(`Started ${appName} on ${PORT}`);
-
-    if (demoInsert) {
-      setInterval(() => {
-        influx.writePoints([
-          {
-            measurement: MarketDataMeasurement,
-            fields: {
-              // symbol: "AAPL",
-              open: 1.1,
-              high: 1.1,
-              low: 1.1,
-              close: count += 1,
-              volume: 1,
-            },
-            // timestamp: new Date().getTime(),
-            tags: {
-              symbol: "UNKNOWN",
-            },
-          },
-        ]); /*  */
-        log("add values", count);
-      }, 1000);
-    }
-
     return true;
-  } catch (error) {
+  } catch (error: any) {
     log("error running app", error && error.message);
     console.error(error);
     process.exit(1);

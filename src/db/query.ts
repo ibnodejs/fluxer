@@ -4,7 +4,6 @@ import { bucket, org } from "../config";
 /**
  * Query for any measurements
  */
-import { Point } from "@influxdata/influxdb-client";
 import { influxDB } from "./database";
 import { values } from "lodash";
 
@@ -17,7 +16,7 @@ interface QueryArgs {
 
 /**
  * Query measurements
- * @param param0
+ * @param QueryArgs
  */
 export const queryMeasurement = async ({
   symbol,
@@ -52,6 +51,7 @@ export const queryMeasurement = async ({
         } else {
           // create a new table
           table[time] = {
+            symbol,
             date: new Date(time), // with date object
             [o._field]: o._value,
           };
