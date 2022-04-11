@@ -1,6 +1,7 @@
 import "mocha";
 
 import { MarketDataSchema } from "./marketdata.schema";
+import dataTSLA from "./TSLA.json";
 import { expect } from "chai";
 import { queryMeasurement } from "./query";
 import { writeMeasurement } from "./write";
@@ -42,15 +43,33 @@ describe("Fluxer V2", () => {
   //   expect(samplesResults.length).to.be.greaterThan(1);
   // });
 
-  it("it should query for some measurements", async () => {
-    const query = await queryMeasurement({
-      symbol: "stq",
-      startingDate: sampleData[0].date,
-      endingDate: sampleData[2].date,
-    });
+  // it("it should query for some measurements", async () => {
+  //   const query = await queryMeasurement({
+  //     symbol: "stq",
+  //     startingDate: sampleData[0].date,
+  //     endingDate: sampleData[2].date,
+  //   });
 
-    console.log("results are", query);
+  //   console.log("results are", query);
 
-    expect(query).to.be.not.undefined;
+  //   expect(query).to.be.not.undefined;
+  // });
+
+  it("it should insert some measurements from TSLA into sample", async () => {
+    const data = dataTSLA.data.candles.map((d) => ({
+      symbol: dataTSLA.data.symbol,
+      open: d.open,
+      high: d.high,
+      low: d.low,
+      close: d.close,
+      volume: d.volume,
+      date: new Date(d.datetime),
+    }));
+
+    const measurements = await writeMeasurement(data);
+
+    console.log("results are", measurements);
+
+    expect(measurements).to.be.not.undefined;
   });
 });
