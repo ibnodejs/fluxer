@@ -29,7 +29,7 @@ const arr = [object];
 describe(`Server ${appName}`, () => {
   it("on / route should respond with json", function (done) {
     request
-      .get("/")
+      .get("/fluxer")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(200, done);
@@ -40,7 +40,7 @@ describe(`Server ${appName}`, () => {
    */
   it("should insert object market data", function (done) {
     request
-      .post("/v1/insert")
+      .post("/fluxer/v1/insert")
       .send(object)
       .set("Accept", "application/json")
       //   .expect("Content-Type", /json/)
@@ -49,7 +49,7 @@ describe(`Server ${appName}`, () => {
 
   it("should insert array market data", function (done) {
     request
-      .post("/v1/insert")
+      .post("/fluxer/v1/insert")
       .send(arr)
       .set("Accept", "application/json")
       //   .expect("Content-Type", /json/)
@@ -58,7 +58,7 @@ describe(`Server ${appName}`, () => {
 
   it("should not insert empty array market data", function (done) {
     request
-      .post("/v1/insert")
+      .post("/fluxer/v1/insert")
       .send([])
       .set("Accept", "application/json")
       .expect(401, done);
@@ -66,7 +66,7 @@ describe(`Server ${appName}`, () => {
 
   it("should not insert empty market data item", function (done) {
     request
-      .post("/v1/insert")
+      .post("/fluxer/v1/insert")
       .send({})
       .set("Accept", "application/json")
       .expect(401, done);
@@ -76,7 +76,7 @@ describe(`Server ${appName}`, () => {
   it("should query market data item", function (done) {
     const cur = new Date(currentDate);
     request
-      .get("/v1/query")
+      .get("/fluxer/v1/query")
       .query({
         symbol: object.symbol,
         start: new Date(cur.setDate(cur.getDate() - 1)).toISOString(),
@@ -90,7 +90,7 @@ describe(`Server ${appName}`, () => {
   it("should query market data items with end", function (done) {
     const cur = new Date(currentDate);
     request
-      .get("/v1/query")
+      .get("/fluxer/v1/query")
       .query({
         symbol: object.symbol,
         start: new Date(cur.setDate(cur.getDate() - 1)),
