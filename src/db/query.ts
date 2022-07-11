@@ -7,7 +7,7 @@ import { bucket, org } from "../config";
 import { influxDB } from "./database";
 import { values } from "lodash";
 
-interface QueryArgs {
+export interface QueryArgs {
   symbol: string;
   startDate: Date;
   endDate: Date;

@@ -37,13 +37,13 @@ export const fluxerRoadman = async (
   return args;
 };
 
-export const fluxerHttpQuery = () => {
+export const fluxerHttpQuery = (): Router => {
   const router = Router();
 
   const query = async (
-    symbol,
-    startingDate,
-    endingDate
+    symbol: string,
+    startingDate: Date,
+    endingDate: Date
   ): Promise<MarketDataSchema[]> => {
     log("dates are", { startingDate, endingDate });
 
