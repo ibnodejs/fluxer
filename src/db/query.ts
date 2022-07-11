@@ -9,8 +9,8 @@ import { values } from "lodash";
 
 interface QueryArgs {
   symbol: string;
-  startingDate: Date;
-  endingDate: Date;
+  startDate: Date;
+  endDate: Date;
   measurement?: string;
 }
 
@@ -20,17 +20,17 @@ interface QueryArgs {
  */
 export const queryMeasurement = async ({
   symbol,
-  startingDate,
-  endingDate,
+  startDate,
+  endDate,
   measurement = MarketDataMeasurement,
 }: QueryArgs): Promise<MarketDataSchema[]> => {
   const queryApi = influxDB.getQueryApi(org);
 
   const fluxQuery = `
   from(bucket: "${bucket}")
-  |> range(start: ${startingDate.toISOString()}, stop: ${endingDate.toISOString()})
+  |> range(start: ${startDate.toISOString()}, stop: ${endDate.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "${measurement}")
-  |> filter(fn: (r) => r["symbol"] == "${symbol}")
+  |> filter(fn: (r) => r["symbol"] == "${symbol.toLocaleUpperCase()}")
   |> group(columns: ["_time"])
   |> yield()
   `;
@@ -39,7 +39,7 @@ export const queryMeasurement = async ({
     let table: { [x: string]: any } = {};
 
     const fluxObserver = {
-      next(row, tableMeta) {
+      next(row: any, tableMeta: any) {
         const o = tableMeta.toObject(row);
         const time = o._time;
         if (table[time]) {
@@ -57,7 +57,7 @@ export const queryMeasurement = async ({
           };
         }
       },
-      error(error) {
+      error(error: Error) {
         console.error(error);
         reject(error);
       },

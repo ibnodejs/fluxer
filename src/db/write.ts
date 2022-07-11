@@ -33,6 +33,8 @@ export const writeMeasurement = async (
 
     await writeApi.close();
 
+    // log(`FLUXER:WRITE ${data[0].symbol} -> ${points.length}`);
+
     return points;
   } catch (err) {
     throw err;
