@@ -1,11 +1,12 @@
 import { MarketDataMeasurement, MarketDataSchema } from "./marketdata.schema";
-import { bucket, org } from "../config";
+import { bucket, org } from "./config";
 
 /**
  * Exports Write method, for any measurements
  */
 import { Point } from "@influxdata/influxdb-client";
-import { influxDB } from "./database";
+import { influxDB } from ".";
+import { log } from "@roadmanjs/logs";
 
 /**
  * Method to write marketdata measurements
@@ -14,7 +15,7 @@ import { influxDB } from "./database";
  */
 export const writeMeasurement = async (
   data: MarketDataSchema[]
-): Promise<Point[]> => {
+): Promise<Point[] | null> => {
   const writeApi = influxDB.getWriteApi(org, bucket);
 
   try {
@@ -33,10 +34,12 @@ export const writeMeasurement = async (
 
     await writeApi.close();
 
-    // log(`FLUXER:WRITE ${data[0].symbol} -> ${points.length}`);
+    log(`FLUXER:WRITE ${data[0].symbol} -> ${points.length}`);
 
     return points;
   } catch (err) {
-    throw err;
+    console.error(err);
+    return null;
+    // throw err;
   }
 };
