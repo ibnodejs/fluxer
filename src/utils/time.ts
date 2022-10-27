@@ -4,3 +4,8 @@ export const addDayToDate = (date: Date, days: number): Date => {
   startingDate.setDate(startingDate.getDate() + days);
   return startingDate;
 };
+
+export const isWeekend = (date: Date): boolean => {
+  const dayOfWeek = date.getDay();
+  return dayOfWeek === 6 || dayOfWeek === 0;
+};
