@@ -1,19 +1,18 @@
 import { GetBars } from "../providers";
 import { MarketDataSchema } from "./marketdata.schema";
+import { PolygonProvider } from "../providers/polygon";
 import { isCache } from "../config";
 import isEmpty from "lodash/isEmpty";
 import { log } from "@roadmanjs/logs";
 import { minimumMarketData } from "../cache/compare";
 import { queryMeasurement } from "./query";
 
-export const isEnoughMarketData = () => {};
-
-export const GetMarketData = async (
+export const QueryMarketData = async (
   args: GetBars
 ): Promise<MarketDataSchema[]> => {
   const { symbol, end, start, crypto } = args;
 
-  log("query", args);
+  log("QueryMarketData", args);
 
   const startDate = new Date(start);
 
@@ -42,26 +41,41 @@ export const GetMarketData = async (
   log("dates are", { startingDate, endingDate });
 
   let data: MarketDataSchema[] = [];
-  try {
-    data = await queryMeasurement({
+
+  const polygon = new PolygonProvider();
+  const getBars = () =>
+    polygon.getBars({
       symbol,
-      startDate: startingDate,
-      endDate: endingDate,
-    });
-
-    log("data response is", data && data.length);
-
-    const returnedCount = data.length;
-    const expectedCount = minimumMarketData({
-      crypto,
       start: startingDate,
       end: endingDate,
     });
 
-    if (isCache && returnedCount < expectedCount) {
-      // Get from provider
-      // save to cache
-      // return the provider data
+  try {
+    if (isCache) {
+      // query and compare cache
+      data = await queryMeasurement({
+        symbol,
+        startDate: startingDate,
+        endDate: endingDate,
+      });
+
+      log("data response is", data && data.length);
+
+      const returnedCount = data.length;
+      const expectedCount = minimumMarketData({
+        crypto,
+        start: startingDate,
+        end: endingDate,
+      });
+
+      if (returnedCount < expectedCount) {
+        // Get from provider
+        data = await getBars();
+        // save to cache
+      }
+    } else {
+      // query provider and return provider data
+      data = await getBars();
     }
 
     if (isEmpty(data)) {
