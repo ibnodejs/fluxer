@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { token, url } from "./config";
+import { token, url } from "../config";
 
 import FluxerResolver from "./fluxer.resolver";
 import { HOSTNAME } from "src/config";

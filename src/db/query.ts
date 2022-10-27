@@ -1,5 +1,5 @@
 import { MarketDataMeasurement, MarketDataSchema } from "./marketdata.schema";
-import { bucket, org } from "./config";
+import { bucket, org } from "../config";
 
 /**
  * Query for any measurements

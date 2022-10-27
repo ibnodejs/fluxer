@@ -1,6 +1,7 @@
 import "dotenv/config";
 
-import { get } from "lodash";
+import get from "lodash/get";
+import isEmpty from "lodash/isEmpty";
 import os from "os";
 
 const { env } = process;
@@ -26,3 +27,9 @@ export const bucket = get(process.env, "INFLUX_BUCKET", "dev");
 
 // Sentry env
 export const sentryDSN = get(process.env, "SENTRY_DSN", "");
+
+// Providers
+
+// Cache
+export const CACHE_KEY = get(process.env, "CACHE_KEY", "");
+export const isCache = !isEmpty(CACHE_KEY);
