@@ -10,3 +10,6 @@ export interface GetBars {
 export interface Provider {
   getBars: (args: GetBars) => Promise<MarketDataSchema[]>;
 }
+
+// writer off thread
+export const saveCache = () => {};

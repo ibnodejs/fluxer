@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@influxdata/influxdb-client": "^1.21.0",
+    "@polygon.io/client-js": "^6.0.6",
     "@roadmanjs/logs": "^0.0.1",
     "@sentry/node": "^5.15.5",
     "@stoqey/finnhub": "^0.3.4",
