@@ -6,6 +6,7 @@
   "scripts": {
     "db": "mocha src/db/*test.ts --exit",
     "test": "PORT=3030 mocha src/*test.ts --exit",
+    "providers": "mocha src/providers/*test.ts --exit",
     "compare": "mocha src/cache/*test.ts --exit",
     "dev": "nodemon src/index.ts",
     "pm2": "pm2 start src/index.ts --watch --name exodus",
