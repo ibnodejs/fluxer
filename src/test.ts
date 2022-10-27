@@ -35,48 +35,11 @@ describe(`Server ${appName}`, () => {
       .expect(200, done);
   });
 
-  /**
-   * /insert
-   */
-  it("should insert object market data", function (done) {
-    request
-      .post("/fluxer/v1/insert")
-      .send(object)
-      .set("Accept", "application/json")
-      //   .expect("Content-Type", /json/)
-      .expect(200, done);
-  });
-
-  it("should insert array market data", function (done) {
-    request
-      .post("/fluxer/v1/insert")
-      .send(arr)
-      .set("Accept", "application/json")
-      //   .expect("Content-Type", /json/)
-      .expect(200, done);
-  });
-
-  it("should not insert empty array market data", function (done) {
-    request
-      .post("/fluxer/v1/insert")
-      .send([])
-      .set("Accept", "application/json")
-      .expect(401, done);
-  });
-
-  it("should not insert empty market data item", function (done) {
-    request
-      .post("/fluxer/v1/insert")
-      .send({})
-      .set("Accept", "application/json")
-      .expect(401, done);
-  });
-
   // query
   it("should query market data item", function (done) {
     const cur = new Date(currentDate);
     request
-      .get("/fluxer/v1/query")
+      .get("/fluxer")
       .query({
         symbol: object.symbol,
         start: new Date(cur.setDate(cur.getDate() - 1)).toISOString(),
@@ -90,7 +53,7 @@ describe(`Server ${appName}`, () => {
   it("should query market data items with end", function (done) {
     const cur = new Date(currentDate);
     request
-      .get("/fluxer/v1/query")
+      .get("/fluxer")
       .query({
         symbol: object.symbol,
         start: new Date(cur.setDate(cur.getDate() - 1)),
@@ -100,5 +63,33 @@ describe(`Server ${appName}`, () => {
       .expect("Content-Type", /json/)
       .expect((res) => res.body.length)
       .expect(200, done);
+  });
+
+  /**
+   * /insert
+   */
+  it("should insert object market data", function (done) {
+    request
+      .post("/fluxer/insert")
+      .send(object)
+      .set("Accept", "application/json")
+      //   .expect("Content-Type", /json/)
+      .expect(200, done);
+  });
+
+  it("should not insert empty array market data", function (done) {
+    request
+      .post("/fluxer/insert")
+      .send([])
+      .set("Accept", "application/json")
+      .expect(401, done);
+  });
+
+  it("should not insert empty market data item", function (done) {
+    request
+      .post("/fluxer/insert")
+      .send({})
+      .set("Accept", "application/json")
+      .expect(401, done);
   });
 });

@@ -3,9 +3,9 @@ import "reflect-metadata";
 import { token, url } from "../config";
 
 import FluxerResolver from "./fluxer.resolver";
-import { HOSTNAME } from "src/config";
 import { InfluxDB } from "@influxdata/influxdb-client";
 import { MarketDataSchema } from "./marketdata.schema";
+import { QueryMarketData } from "./cache";
 import { RoadmanBuild } from "roadman";
 import { Router } from "express";
 import isEmpty from "lodash/isEmpty";
@@ -17,14 +17,20 @@ export let influxDB: InfluxDB;
 
 export const fluxerHttpQuery = () => {
   const router = Router();
+  router.get("/", async function async(req, res) {
+    const {
+      symbol = "AAPL",
+      start: startDateOg = new Date(),
+      end,
+    } = (req.params || {}) as any;
 
-  router.get("/", function (req, res) {
-    res.json({
-      hostname: HOSTNAME,
-      date: new Date(),
+    log("query", req.query);
+    const data = await QueryMarketData({
+      symbol,
+      start: startDateOg,
+      end,
     });
-
-    log("health check");
+    res.json(data);
   });
 
   router.post("/", async function async(req, res) {
@@ -35,48 +41,12 @@ export const fluxerHttpQuery = () => {
     } = (req.query || {}) as any;
 
     log("query", req.query);
-    const startDate = new Date(startDateOg);
-
-    const { startingDate, endingDate } = (() => {
-      // if we have endDate
-      if (end) {
-        return {
-          endingDate: new Date(end),
-          startingDate: new Date(startDate),
-        };
-      }
-
-      // Else clone startDate, go back a day in the past and set as endingDate
-      const cloneStartDate = new Date(startDate);
-      let startingDate = new Date(
-        cloneStartDate.setDate(cloneStartDate.getDate() - 1)
-      );
-      let endingDate = startDate;
-
-      return {
-        endingDate,
-        startingDate,
-      };
-    })();
-
-    log("dates are", { startingDate, endingDate });
-
-    let data: MarketDataSchema[] = [];
-    try {
-      data = await queryMeasurement({
-        symbol,
-        startDate: startingDate,
-        endDate: endingDate,
-      });
-      log("data response is", data && data.length);
-      if (isEmpty(data)) {
-        throw new Error("Error market data null");
-      }
-    } catch (error) {
-      log("error getting candles", error);
-    } finally {
-      return res.json(data);
-    }
+    const data = await QueryMarketData({
+      symbol,
+      start: startDateOg,
+      end,
+    });
+    res.json(data);
   });
 
   // @deprecated
