@@ -2,8 +2,9 @@ import { Resolver, Query, Arg, UseMiddleware } from "type-graphql";
 import _get from "lodash/get";
 
 import { log } from "@roadmanjs/logs";
-import { MarketData, MarketDataModel } from "./fluxer.model";
+import { MarketData, MarketDataModel, TickerData } from "./fluxer.model";
 import { queryMeasurement } from "./query";
+import { QueryTickerData, QueryMarketData } from "./cache";
 
 @Resolver()
 export class FluxerResolver {
@@ -15,10 +16,16 @@ export class FluxerResolver {
     @Arg("endDate", { nullable: true }) endDate: Date
   ): Promise<MarketData[]> {
     try {
-      const points = await queryMeasurement({
+      log("getMarketData", {
         symbol,
-        startDate,
-        endDate,
+        start: startDate,
+        end: endDate,
+      });
+
+      const points = await QueryMarketData({
+        symbol,
+        start: startDate,
+        end: endDate,
       });
 
       const parsedData = points.map((d) => MarketDataModel.parse(d));
@@ -26,6 +33,22 @@ export class FluxerResolver {
     } catch (error) {
       log("error getting marketdata", error);
       return [];
+    }
+  }
+
+  @Query(() => TickerData)
+  async getTicker(
+    @Arg("symbol", { nullable: false }) symbol: string
+  ): Promise<TickerData | null> {
+    try {
+      log("getTicker", {
+        symbol,
+      });
+      const tickerDetails = await QueryTickerData(symbol);
+      return tickerDetails;
+    } catch (error) {
+      log("error getting marketdata", error);
+      return null;
     }
   }
 }

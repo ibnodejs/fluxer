@@ -24,4 +24,18 @@ export class MarketData {
   date: Date;
 }
 
+@ObjectType()
+export class TickerData {
+  @Field(() => String, { nullable: true })
+  symbol: string;
+
+  @Field(() => String, { nullable: true })
+  industry?: string;
+
+  @Field(() => String, { nullable: true })
+  logo: string;
+
+  // ...
+}
+
 export const MarketDataModel = new Model(MarketData.name);
