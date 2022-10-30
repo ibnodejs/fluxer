@@ -1,7 +1,7 @@
 import { GetBars, Provider } from ".";
 import { IRestClient, restClient } from "@polygon.io/client-js";
 
-import { TickerData } from "src/db/marketdata.schema";
+import { TickerData } from "../db/fluxer.model";
 import { log } from "roadman";
 
 const POLYGON_KEY = process.env.POLYGON_KEY;
@@ -52,11 +52,19 @@ export class PolygonProvider implements Provider {
 
     const tickerDetails = await polygonRest.reference.tickerDetails(symbol);
 
+    const apiParams = `apiKey=${POLYGON_KEY}`;
+
     if (tickerDetails.results) {
+      const ticker = tickerDetails.results;
       const results: TickerData = {
+        name: ticker.name,
+        description: ticker.description,
+        locale: ticker.locale,
         symbol,
-        logo: tickerDetails.results.branding?.logo_url || "",
-        industry: tickerDetails.results.market, // TODO
+        icon: `${ticker.branding?.logo_url || ""}?${apiParams}`,
+        logo: `${ticker.branding?.icon_url || ""}?${apiParams}`,
+        market: ticker.market, // TODO
+        industry: ticker.sic_description,
       };
       log(`PolygonProvider:Ticker ${symbol} -> results: ${results}`);
       return results;

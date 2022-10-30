@@ -8,9 +8,3 @@ export interface MarketDataSchema {
   volume: number;
   date: Date;
 }
-
-export interface TickerData {
-  symbol: string;
-  industry?: string;
-  logo: string;
-}

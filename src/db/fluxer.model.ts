@@ -30,10 +30,28 @@ export class TickerData {
   symbol: string;
 
   @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => String, { nullable: true })
+  description?: string;
+
+  @Field(() => String, { nullable: true })
+  locale?: string;
+
+  @Field(() => String, { nullable: true })
+  exchange?: string;
+
+  @Field(() => String, { nullable: true })
+  market?: string;
+
+  @Field(() => String, { nullable: true })
   industry?: string;
 
   @Field(() => String, { nullable: true })
   logo: string;
+
+  @Field(() => String, { nullable: true })
+  icon: string;
 
   // ...
 }
