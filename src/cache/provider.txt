@@ -122,7 +122,6 @@ export const circleMarketDataCrypto = async (symbol: string) => {
         symbol,
         start: currentRange?.start,
         end: currentRange?.end,
-        timeframe: "1Min",
       });
 
       await delay(() => {}, 3000);

@@ -2,8 +2,7 @@ import "mocha";
 
 import { PORT, appName } from "./config";
 
-import chalk from "chalk";
-import { runApp } from ".";
+import { runApp } from "./app";
 import supertest from "supertest";
 
 // Start server

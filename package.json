@@ -1,24 +1,35 @@
 {
-  "name": "fluxer",
-  "version": "0.0.2",
-  "description": "",
-  "main": "index.js",
+  "name": "@roadmanjs/fluxer",
+  "version": "0.0.3",
+  "description": " A roadman for market data",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "docs/",
+    "build/",
+    "register/",
+    "LICENSE"
+  ],
+  "author": {
+    "name": "Ceddy Muhoza",
+    "email": "ceddymuhoza@gmail.com",
+    "url": "https://ceddy.org"
+  },
   "scripts": {
     "db": "mocha src/db/*test.ts --exit",
     "test": "PORT=3030 mocha src/*test.ts --exit",
     "providers": "mocha src/providers/*test.ts --exit",
     "compare": "mocha src/cache/*test.ts --exit",
-    "dev": "nodemon src/index.ts",
-    "pm2": "pm2 start src/index.ts --watch --name exodus",
+    "dev": "nodemon src/app.ts",
+    "pm2": "pm2 start src/app.ts --watch --name exodus",
     "build": "tsc --skipLibCheck",
-    "serve": "NODE_ENV=production node build"
+    "serve": "NODE_ENV=production node build/app"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ibnode/fluxer.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ibnode/fluxer/issues"
