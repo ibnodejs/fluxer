@@ -1,4 +1,4 @@
-import { MarketDataSchema, TickerData } from "../db/marketdata.schema";
+import { MarketData, TickerData } from "../db/fluxer.model";
 
 export interface GetBars {
   start: Date;
@@ -8,7 +8,7 @@ export interface GetBars {
 }
 
 export interface Provider {
-  getBars: (args: GetBars) => Promise<MarketDataSchema[]>;
+  getBars: (args: GetBars) => Promise<MarketData[]>;
   getTicker?: (symbol: string) => Promise<TickerData | null>;
 }
 
