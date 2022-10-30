@@ -1,11 +1,11 @@
 import "reflect-metadata";
 
+import { QueryMarketData, QueryTickerData } from "./cache";
 import { token, url } from "../config";
 
 import FluxerResolver from "./fluxer.resolver";
 import { InfluxDB } from "@influxdata/influxdb-client";
 import { MarketDataSchema } from "./marketdata.schema";
-import { QueryMarketData } from "./cache";
 import { RoadmanBuild } from "roadman";
 import { Router } from "express";
 import isEmpty from "lodash/isEmpty";
@@ -118,6 +118,22 @@ export const fluxerHttpQuery = () => {
       res.status(401);
       res.end();
     }
+  });
+
+  router.post("/ticker", async function async(req, res) {
+    const { symbol = "AAPL" } = (req.body || {}) as any;
+
+    log("query", req.body);
+    const data = await QueryTickerData(symbol);
+    res.json(data);
+  });
+
+  router.get("/ticker", async function async(req, res) {
+    const { symbol = "AAPL" } = (req.params || {}) as any;
+
+    log("query", req.params);
+    const data = await QueryTickerData(symbol);
+    res.json(data);
   });
 
   return router;

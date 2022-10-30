@@ -87,3 +87,13 @@ export const QueryMarketData = async (
     return [];
   }
 };
+
+export const QueryTickerData = async (symbol: string) => {
+  try {
+    const provider = new PolygonProvider();
+    const tickerDetails = await provider.getTicker(symbol);
+    return tickerDetails;
+  } catch (error) {
+    return null;
+  }
+};

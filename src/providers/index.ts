@@ -1,4 +1,4 @@
-import { MarketDataSchema } from "../db/marketdata.schema";
+import { MarketDataSchema, TickerData } from "../db/marketdata.schema";
 
 export interface GetBars {
   start: Date;
@@ -9,6 +9,7 @@ export interface GetBars {
 
 export interface Provider {
   getBars: (args: GetBars) => Promise<MarketDataSchema[]>;
+  getTicker?: (symbol: string) => Promise<TickerData | null>;
 }
 
 // writer off thread
