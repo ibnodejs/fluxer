@@ -1,32 +1,50 @@
-import { addDayToDate } from "../utils/time";
-import moment from "moment";
+import { addDayToDate, isWeekend } from "../utils/time";
+import moment, { Moment } from "moment";
 /**
  * Compare demanded market data and returned data
  */
 
 // I'll assume a symbols has a minimum of these ticks in a day
-const MarketDataCount = 360;
+const minMarketDataCount = 720;
 
 interface IsEnough {
-  returnedCount: number;
+  crypto?: boolean;
   start: Date;
   end?: Date;
-  limit?: number;
 }
 
-export const isMarketDataCountEnough = (args: IsEnough): boolean => {
-  const { returnedCount, start, end, limit = MarketDataCount } = args;
-  // find the number of days. from start and end
-  // multiply by minimum per day
-  // compare if returnedCount is equal or greater.
+export const minimumMarketData = (args: IsEnough): number => {
+  const { start, end, crypto = false } = args;
+  const dayLimitStocks = 720;
+  const dayLimitCrypto = 1440;
+
+  const dayLimit = crypto ? dayLimitCrypto : dayLimitStocks;
 
   const endingDate = end ? end : addDayToDate(start, 1);
-
   const startDate = moment(new Date(start));
   const endDate = moment(new Date(endingDate));
-  const diff = endDate.diff(startDate, "d");
+  const diff = endDate.diff(startDate, "d") || 1;
 
-  const minimumForRequestedDays = diff * limit;
+  let minimumForRequestedDays = diff * dayLimit;
+  if (!crypto) {
+    const weekendsBetweenDays = getWeekends(start, diff);
+    const daysToRemove = weekendsBetweenDays * dayLimit;
+    minimumForRequestedDays = minimumForRequestedDays - daysToRemove;
+  }
 
-  return returnedCount >= minimumForRequestedDays;
+  return minimumForRequestedDays;
+};
+
+export const getWeekends = (start: Date, days: number): number => {
+  let weekends = 0;
+  let date = new Date(start);
+
+  for (let i = 0; i < days; i++) {
+    date = addDayToDate(date, 1);
+    if (isWeekend(date)) {
+      weekends += 1;
+    }
+  }
+
+  return weekends;
 };

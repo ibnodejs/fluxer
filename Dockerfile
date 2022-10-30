@@ -13,4 +13,4 @@ RUN apk add libc6-compat
 COPY --from=builder /srv .
 ENV NODE_ENV=production
 EXPOSE 3000
-CMD ["node", "build/index.js"]
+CMD ["node", "build/app.js"]
