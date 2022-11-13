@@ -13,6 +13,8 @@ import { log } from "@roadmanjs/logs";
 import { queryMeasurement } from "./query";
 import { writeMeasurement } from "./write";
 
+export * from "./fluxer.methods";
+
 export let influxDB: InfluxDB;
 
 export const fluxerHttpQuery = () => {

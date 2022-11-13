@@ -5,7 +5,7 @@ import { log } from "@roadmanjs/logs";
 import { MarketData, MarketDataModel, TickerData } from "./fluxer.model";
 import { queryMeasurement } from "./query";
 import { QueryTickerData, QueryMarketData } from "./cache";
-
+import { getMarketData, getTicker } from "./fluxer.methods";
 @Resolver()
 export class FluxerResolver {
   @Query(() => [MarketData])
@@ -18,18 +18,15 @@ export class FluxerResolver {
     try {
       log("getMarketData", {
         symbol,
-        start: startDate,
-        end: endDate,
+        startDate,
+        endDate,
       });
 
-      const points = await QueryMarketData({
+      return await getMarketData({
         symbol,
-        start: startDate,
-        end: endDate,
+        startDate,
+        endDate,
       });
-
-      const parsedData = points.map((d) => MarketDataModel.parse(d));
-      return parsedData;
     } catch (error) {
       log("error getting marketdata", error);
       return [];
@@ -44,7 +41,7 @@ export class FluxerResolver {
       log("getTicker", {
         symbol,
       });
-      const tickerDetails = await QueryTickerData(symbol);
+      const tickerDetails = await getTicker(symbol);
       return tickerDetails;
     } catch (error) {
       log("error getting marketdata", error);
