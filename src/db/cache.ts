@@ -1,4 +1,5 @@
-import { GetBars } from "../providers";
+import { GetBars, getProvider } from "../providers";
+
 import { MarketDataSchema } from "./marketdata.schema";
 import { PolygonProvider } from "../providers/polygon";
 import { isCache } from "../config";
@@ -6,7 +7,7 @@ import isEmpty from "lodash/isEmpty";
 import { log } from "@roadmanjs/logs";
 import { minimumMarketData } from "../cache/compare";
 import { queryMeasurement } from "./query";
-
+import { writeMeasurement } from "./write";
 export const QueryMarketData = async (
   args: GetBars
 ): Promise<MarketDataSchema[]> => {
@@ -42,9 +43,9 @@ export const QueryMarketData = async (
 
   let data: MarketDataSchema[] = [];
 
-  const polygon = new PolygonProvider();
+  const provider = getProvider();
   const getBars = () =>
-    polygon.getBars({
+    provider.getBars({
       symbol,
       start: startingDate,
       end: endingDate,
@@ -72,6 +73,7 @@ export const QueryMarketData = async (
         // Get from provider
         data = await getBars();
         // save to cache
+        await writeMeasurement(data)
       }
     } else {
       // query provider and return provider data

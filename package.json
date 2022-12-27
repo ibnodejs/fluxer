@@ -63,6 +63,7 @@
     "dotenv": "^8.2.0",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
+    "node-kraken-api": "^2.2.2",
     "roadman": "^0.3.0"
   }
 }

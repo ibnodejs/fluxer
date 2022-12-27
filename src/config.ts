@@ -33,3 +33,22 @@ export const sentryDSN = get(process.env, "SENTRY_DSN", "");
 // Cache
 export const CACHE_KEY = get(process.env, "CACHE_KEY", "");
 export const isCache = !isEmpty(CACHE_KEY);
+
+
+export const POLYGON_KEY = get(
+    process.env,
+    "POLYGON_KEY",
+    ""
+);
+
+export const KRAKEN_KEY = get(
+    process.env,
+    "KRAKEN_KEY",
+    ""
+);
+
+export const KRAKEN_SECRET = get(
+    process.env,
+    "KRAKEN_SECRET",
+    ""
+);
