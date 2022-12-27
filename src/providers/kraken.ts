@@ -31,11 +31,15 @@ export class KrakenProvider implements Provider {
     let last = start.getTime();
     const endTime = end.getTime();
 
-    // TODO delayed calls
+    const delay = (time: number, value = "resolve") => {
+      return new Promise((resolve) => {
+        setTimeout(() => { resolve(value) }, time)
+      });
+    }
 
     while (last <= endTime) {
 
-      console.log("last", last, krakensymbol)
+      log("last", last, krakensymbol)
       // get more data 
       const returnedBars = await this.provider.trades({
         since: last / 1000 + "",
@@ -48,7 +52,7 @@ export class KrakenProvider implements Provider {
       const lastBar = pairData[pairData.length - 1];
       last = Math.round(+lastBar[2] * 1000);
 
-      console.log("new last", last)
+      await delay(800);
     }
 
     log(`KrakenProvider: bars: ${bars.length}`);
@@ -90,8 +94,8 @@ export class KrakenProvider implements Provider {
       }
     });
 
-    console.log("first", marketdata.shift()?.date + " ")
-    console.log("last", marketdata.pop()?.date + " ")
+    // log("first", marketdata[0]?.date + " ")
+    // log("last", marketdata[marketdata.length - 1]?.date + " ")
 
     log(`KrakenProvider: ${symbol} -> total: ${marketdata.length}`);
 
