@@ -78,9 +78,10 @@ export class KrakenProvider implements Provider {
       const [price, volume, date, action, market, mis, trade_id] = d;
       const high = 0;
       const low = 0;
+      const open = 0;
       return {
         close: +price,
-        open: +price,
+        open: open,
         date: new Date(+date * 1000),
         volume: +volume,
         high: high,

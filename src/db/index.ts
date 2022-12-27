@@ -24,7 +24,7 @@ export const fluxerHttpQuery = () => {
       symbol = "AAPL",
       start: startDateOg = new Date(),
       end,
-    } = (req.params || {}) as any;
+    } = (req.query || {}) as any;
 
     log("query", req.query);
     const data = await QueryMarketData({

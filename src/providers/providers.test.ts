@@ -14,10 +14,10 @@ describe("Marketdata Providers tests", () => {
     const bars = await kraken.getBars({
       symbol: "MATIC/USD",
       start: new Date("2022-10-20"),
-      end: new Date("2022-10-27"),
+      end: new Date("2022-10-21"),
     });
 
-    // console.log("KrakenProvider -> ", bars);
+    console.log("KrakenProvider -> ", bars[0]);
 
     expect(bars.length).to.be.greaterThan(300);
   });
