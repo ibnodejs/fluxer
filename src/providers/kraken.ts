@@ -1,20 +1,9 @@
 import { GetBars, Provider } from ".";
+import { KRAKEN_KEY, KRAKEN_SECRET } from "../config";
 
 import { Kraken } from "node-kraken-api";
 import _get from "lodash/get";
 import { log } from "roadman";
-
-export const KRAKEN_KEY = _get(
-  process.env,
-  "KRAKEN_KEY",
-  ""
-);
-
-export const KRAKEN_SECRET = _get(
-  process.env,
-  "KRAKEN_SECRET",
-  ""
-);
 
 // start client from here
 // TODO match types
@@ -28,6 +17,12 @@ export class KrakenProvider implements Provider {
   }
   async getBars(args: GetBars): Promise<any[]> {
     const { start, end, symbol } = args;
+
+    let krakensymbol = args.symbol;
+
+    if (symbol.startsWith("X")) {
+      krakensymbol = krakensymbol.replace("X.", "");
+    }
 
     log(`KrakenProvider: ${symbol} -> start: ${start} - end: ${end}`);
 
@@ -44,7 +39,7 @@ export class KrakenProvider implements Provider {
       // get more data 
       const returnedBars = await this.provider.trades({
         since: last / 1000 + "",
-        pair: symbol,
+        pair: krakensymbol,
       });
 
       const pairData = returnedBars[symbol];

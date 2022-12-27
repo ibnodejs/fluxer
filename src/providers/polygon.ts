@@ -1,10 +1,9 @@
 import { GetBars, Provider } from ".";
 import { IRestClient, restClient } from "@polygon.io/client-js";
 
+import { POLYGON_KEY } from "../config";
 import { TickerData } from "../db/fluxer.model";
 import { log } from "roadman";
-
-const POLYGON_KEY = process.env.POLYGON_KEY;
 
 // start client from here
 // TODO match types

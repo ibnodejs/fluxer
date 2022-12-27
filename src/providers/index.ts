@@ -1,5 +1,10 @@
 import { MarketData, TickerData } from "../db/fluxer.model";
 
+import { KrakenProvider } from "./kraken";
+import { POLYGON_KEY } from "../config";
+import { PolygonProvider } from "./polygon";
+import isEmpty from "lodash/isEmpty";
+
 export interface GetBars {
   start: Date;
   end: Date;
@@ -13,4 +18,11 @@ export interface Provider {
 }
 
 // writer off thread
-export const saveCache = () => {};
+export const saveCache = () => { };
+
+export const getProvider = (): Provider => {
+  if (isEmpty(POLYGON_KEY)) {
+    return new KrakenProvider();
+  }
+  return new PolygonProvider();
+}
