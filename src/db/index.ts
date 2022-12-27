@@ -17,8 +17,8 @@ export * from "./fluxer.methods";
 
 export let influxDB: InfluxDB;
 
-export const fluxerHttpQuery = () => {
-  const router = Router();
+export const fluxerHttpQuery = (route?: any) => {
+  const router: Router = route ? route : Router();
   router.get("/", async function async(req, res) {
     const {
       symbol = "AAPL",
