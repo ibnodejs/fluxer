@@ -21,7 +21,7 @@ export class KrakenProvider implements Provider {
     let krakensymbol = args.symbol;
 
     if (symbol.startsWith("X")) {
-      krakensymbol = krakensymbol.replace("X.", "");
+      krakensymbol = krakensymbol.replace("X:", "");
     }
 
     log(`KrakenProvider: ${symbol} -> start: ${start} - end: ${end}`);
@@ -31,18 +31,18 @@ export class KrakenProvider implements Provider {
     let last = start.getTime();
     const endTime = end.getTime();
 
-    // TODO
-    // map start and end
+    // TODO delayed calls
 
     while (last <= endTime) {
-      console.log("last", last)
+
+      console.log("last", last, krakensymbol)
       // get more data 
       const returnedBars = await this.provider.trades({
         since: last / 1000 + "",
         pair: krakensymbol,
       });
 
-      const pairData = returnedBars[symbol];
+      const pairData = returnedBars[krakensymbol];
       bars.push(...pairData);
 
       const lastBar = pairData[pairData.length - 1];
@@ -76,13 +76,15 @@ export class KrakenProvider implements Provider {
     const marketdata = (bars || []).map((d) => {
       // const [date, open, high, low, close, vwap, volume, count] = d;
       const [price, volume, date, action, market, mis, trade_id] = d;
+      const high = 0;
+      const low = 0;
       return {
         close: +price,
         open: +price,
         date: new Date(+date * 1000),
         volume: +volume,
-        // high: +high,
-        // low: +low,
+        high: high,
+        low: low,
         symbol,
       }
     });
