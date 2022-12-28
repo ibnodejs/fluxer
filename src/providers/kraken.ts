@@ -46,11 +46,24 @@ export class KrakenProvider implements Provider {
         pair: krakensymbol,
       });
 
-      const pairData = returnedBars[krakensymbol];
+      const returnedBarsKeys = Object.keys(returnedBars);
+
+      const pairData = returnedBars[returnedBarsKeys[0]] || [];
+      log("pairData", pairData.length)
+
       bars.push(...pairData);
 
       const lastBar = pairData[pairData.length - 1];
-      last = Math.round(+lastBar[2] * 1000);
+      const newlast = Math.round(+lastBar[2] * 1000);
+
+      if (newlast === last) {
+        // break loop
+        last = endTime + 1;
+      } else {
+        last = newlast;
+      }
+
+      log("newlast", last)
 
       await delay(800);
     }
