@@ -31,6 +31,7 @@ export const queryMeasurement = async ({
   |> range(start: ${startDate.toISOString()}, stop: ${endDate.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "${measurement}")
   |> filter(fn: (r) => r["symbol"] == "${symbol.toLocaleUpperCase()}")
+  |> window(period: 1m)
   |> group(columns: ["_time"])
   |> yield()
   `;
