@@ -1,6 +1,6 @@
 {
   "name": "@roadmanjs/fluxer",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": " A roadman for market data",
   "main": "build/index.js",
   "types": "build/index.d.ts",
