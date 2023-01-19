@@ -31,7 +31,7 @@ export const queryMeasurement = async ({
   |> range(start: ${startDate.toISOString()}, stop: ${endDate.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "${measurement}")
   |> filter(fn: (r) => r["symbol"] == "${symbol.toLocaleUpperCase()}")
-  |> group(columns: ["_time"])
+  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
   |> yield()
   `;
 
